@@ -1,9 +1,26 @@
-name = "U1Array"
+name = "U1ArrayKit"
 uuid = "1b3e7b06-38da-4c60-98ff-99e784a7fcb4"
 authors = ["XingyuZhang2018 <864129714@qq.com> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+OMEinsum = "ebe7aa44-baf0-506c-a96f-8464559b3922"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+VectorInterface = "409d34a3-91d5-4945-b6ec-7529ddf182d8"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
 [compat]
+CUDA = "5.5.2"
+KrylovKit = "0.8.3"
+LinearAlgebra = "1.11.0"
+Parameters = "0.12.3"
+Random = "1.11.0"
+VectorInterface = "0.4.9"
+Zygote = "0.6.41"
 julia = "1.11"
 
 [extras]

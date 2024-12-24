@@ -93,7 +93,7 @@ end
     @test ein"(abc,cd),def->abef"(U, Diagonal(S), Vt) ≈ A
     U, S, V = svd!(copy(A); trunc=5)
     @test sum(S.dims) == [5, 5]
-    @show norm(U * Diagonal(S) * V' - A)
+    @test norm(U * Diagonal(S) * V' - A) != 0
 end
 
 @testset "invDiagU1Matrix with $sitetype $atype{$dtype}" for atype in [Array], dtype in [ComplexF64], sitetype in [electronPn(),electronZ2(),tJZ2()]

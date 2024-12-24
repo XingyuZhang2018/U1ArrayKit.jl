@@ -16,20 +16,21 @@ import Zygote: accum
 export AbstractSiteType, indextoqn
 export randU1, zerosU1, asU1Array, asArray, getqrange, getblockdims, qndims, randU1DiagMatrix, invDiagU1Matrix, IU1
 export SymmetricType
-export asArray, asSymmetryArray, symmetryreshape, getsymmetry, getdir
-export qrpos, lqpos
-export _mattype, _arraytype
 export randinitial, zerosinitial, Iinitial
+export asArray, asSymmetryArray, symmetryreshape, getsymmetry, getdir
+export dtr, qrpos, lqpos
+export _mattype, _arraytype
 export U1Array, U1reshape, U1reshapeinfo
 
 include("sitetype.jl")
 include("base.jl")
+include("utils.jl")
 include("initial.jl")
 include("convert.jl")
-include("symmetrictype.jl")
 include("einsum.jl")
 include("vectorinterface.jl")
 include("decomposition.jl")
 include("u1reshape.jl")
+include("symmetrictype.jl")
 
 end

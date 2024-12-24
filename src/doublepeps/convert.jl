@@ -23,7 +23,7 @@ function convert_bilayer_Z2(M::AbstractArray{T, N}) where {T, N}
         i != 1 && (M = permutedims(M, [2, [3:N; 1]...]))
         M = convert_bilayer_Z2_front(M)
     end
-    return permutedims(M, [2, [1; 3:N]...])
+    return permutedims(M, [2, [3:N; 1]...])
 end
 
 function convert_bilayer_Z2(M::DoubleArray)

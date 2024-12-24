@@ -166,3 +166,24 @@ function indextoqn(::tJZ2, i::Int)
 
     return sum(qni) % 2
 end
+
+"""
+    indextoqn(::DoublePEPSZ2, i::Int)
+
+index to quantum number for Double PEPS Z2 sysmmetry
+"""
+struct DoublePEPSZ2 <: AbstractSiteType 
+    ifZ2::Bool
+    D::Int
+end
+DoublePEPSZ2(D) = DoublePEPSZ2(true, D)
+export DoublePEPSZ2
+function indextoqn(stype::DoublePEPSZ2, i::Int)
+    i -= 1
+    i == 0 && return 0
+
+    D = stype.D
+    i1 = i ÷ D
+    i2 = i % D
+    return i2 > i1 ? 1 : 0
+end

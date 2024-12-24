@@ -18,4 +18,6 @@ CUDA.allowscalar(false)
     include("test_vectorinterface.jl")
     include("test_decomposition.jl")
     include("test_u1reshape.jl")
+    include("test_symmetrictype.jl")
+    include("test_doublepeps.jl")
 end

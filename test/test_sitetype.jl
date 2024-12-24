@@ -4,6 +4,7 @@
     @test electronZ2 <: AbstractSiteType
     @test tJSz <: AbstractSiteType
     @test tJZ2 <: AbstractSiteType
+    @test DoublePEPSZ2 <: AbstractSiteType
 
     @test [indextoqn(electronPn(), i) for i in 1:8] == [0, 1, 1, 2, 1, 2, 2, 3]
     @test getqrange(electronPn(), 8) == [[0,1,2,3]]
@@ -24,4 +25,8 @@
     @test [indextoqn(tJZ2(), i) for i in 1:8] == [0, 1, 1, 1, 0, 0, 1, 0]
     @test getqrange(tJZ2(), 8) == [[0,1]]
     @test getblockdims(tJZ2(), 8) == [[4,4]]
+
+    @test [indextoqn(DoublePEPSZ2(3), i) for i in 1:9] == [0, 1, 1, 0, 0, 1, 0, 0, 0]
+    @test getqrange(DoublePEPSZ2(3), 9) == [[0,1]]
+    @test getblockdims(DoublePEPSZ2(3), 9) == [[6,3]]
 end

@@ -21,6 +21,7 @@ export asArray, asSymmetryArray, symmetryreshape, getsymmetry, getdir
 export dtr, qrpos, lqpos
 export _mattype, _arraytype
 export U1Array, U1reshape, U1reshapeinfo
+export DoubleArray, convert_bilayer_Z2, asComplexArray
 
 include("sitetype.jl")
 include("base.jl")
@@ -32,5 +33,7 @@ include("vectorinterface.jl")
 include("decomposition.jl")
 include("u1reshape.jl")
 include("symmetrictype.jl")
+include("doublepeps/base.jl")
+include("doublepeps/convert.jl")
 
 end

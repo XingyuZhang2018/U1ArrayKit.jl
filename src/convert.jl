@@ -22,7 +22,8 @@ function qndims(A::U1Array, ind::Int)
     return indqn, indims
 end
 
-getq(sitetype, s::Int...) = map(s -> [indextoqn(sitetype, i) for i = 1:s], s)
+getq(sitetype::AbstractSiteType, s::Int...) = map(s -> [indextoqn(sitetype, i) for i = 1:s], s)
+getq(sitetypes::Vector{<:AbstractSiteType}, s::Int...) = map((s,sitetype) -> [indextoqn(sitetype, i) for i = 1:s], s, sitetypes)
 getqrange(sitetype, s::Tuple{Vararg{Int}}) = getqrange(sitetype, s...)
 getqrange(sitetype, s::Int...) = (q = getq(sitetype, s...); [map(q -> sort(unique(q)), q)...])
 getshift(qrange) = map(q -> abs(q[1]), qrange) .+ 1
@@ -38,7 +39,7 @@ function getblockdims(sitetype, s::Int...)
     [map(q -> [sum(q .== i) for i in sort(unique(q))], q)...]
 end
 
-function U1selection(sitetype, indqn::Vector{Int}, indims::Vector{Int})
+function U1selection(sitetype, indims::Vector{Int})
     maxs = sum(indims)
     q = [indextoqn(sitetype, i) for i = 1:maxs]
     [q .== i for i in sort(unique(q))]
@@ -49,12 +50,12 @@ function U1selection(sitetype, maxs::Int)
     [q .== i for i in sort(unique(q))]
 end
 
-function asArray(sitetype, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A))) where {T <: Number, N}
+function asArray(sitetype::AbstractSiteType, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A))) where {T <: Number, N}
     atype = _arraytype(A.tensor)
     tensor = zeros(T, size(A))
     Aqn = A.qn
     Atensor = A.tensor
-    qlist = [U1selection(sitetype, indqn[i], indims[i]) for i = 1:N]
+    qlist = [U1selection(sitetype, indims[i]) for i = 1:N]
     div = blockdiv(A.dims)
     for i in 1:length(Aqn)
         tensor[[qlist[j][indexin([Aqn[i][j]], indqn[j])...] for j = 1:N]...] = Array(Atensor[div[i]])
@@ -62,13 +63,26 @@ function asArray(sitetype, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange
     atype(tensor)
 end
 
-function asArray(sitetype, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A))) where {T <: AbstractArray, N}
+function asArray(sitetypes::Vector{<:AbstractSiteType}, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange(sitetypes, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetypes, size(A))) where {T <: Number, N}
+    atype = _arraytype(A.tensor)
+    tensor = zeros(T, size(A))
+    Aqn = A.qn
+    Atensor = A.tensor
+    qlist = [U1selection(sitetypes[i], indims[i]) for i = 1:N]
+    div = blockdiv(A.dims)
+    for i in 1:length(Aqn)
+        tensor[[qlist[j][indexin([Aqn[i][j]], indqn[j])...] for j = 1:N]...] = Array(Atensor[div[i]])
+    end
+    atype(tensor)
+end
+
+function asArray(sitetype::AbstractSiteType, A::U1Array{T,N}; indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A))) where {T <: AbstractArray, N}
     atype = _arraytype(A.tensor[1])
     etype = eltype(A.tensor[1])
     tensor = zeros(etype, size(A))
     Aqn = A.qn
     Atensor = A.tensor
-    qlist = [U1selection(sitetype, indqn[i], indims[i]) for i = 1:N]
+    qlist = [U1selection(sitetype, indims[i]) for i = 1:N]
     for i in 1:length(Aqn)
         tensor[[qlist[j][indexin([Aqn[i][j]], indqn[j])...] for j = 1:N]...] = Array(Atensor[i])
     end
@@ -104,14 +118,26 @@ end
 
 # have Bugs with CUDA@v3.5.0, rely on https://github.com/JuliaGPU/CUDA.jl/issues/1304
 # which is fixed in new vervion, but its allocation is abnormal
-function asU1Array(sitetype, A::AbstractArray{T,N}; dir::Vector{Int}, indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A)), q::Vector{Int}=[0]) where {T, N}
+function asU1Array(sitetype::AbstractSiteType, A::AbstractArray{T,N}; dir::Vector{Int}, indqn::Vector{Vector{Int}}=getqrange(sitetype, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetype, size(A)), q::Vector{Int}=[0], division::Int=1) where {T, N}
     atype = _arraytype(A)
     Aarray = Array(A)
-    qlist = [U1selection(sitetype, indqn[i], indims[i]) for i = 1:N]
+    qlist = [U1selection(sitetype, indims[i]) for i = 1:N]
     Aqn = getqn(dir, indqn; q = q, ifZ2=sitetype.ifZ2)
     tensor = [atype(Aarray[[qlist[j][indexin([Aqn[i][j]], indqn[j])...] for j = 1:N]...]) for i in 1:length(Aqn)]
     dims = map(x -> collect(size(x)), tensor)
     nozeroind = norm.(tensor) .!= 0
     tensor = atype{T}(vcat(map(vec, tensor[nozeroind])...))
-    U1Array(Aqn[nozeroind], dir, tensor, size(A), dims[nozeroind], 1, sitetype.ifZ2)
+    U1Array(Aqn[nozeroind], dir, tensor, size(A), dims[nozeroind], division, sitetype.ifZ2)
+end
+
+function asU1Array(sitetypes::Vector{<:AbstractSiteType}, A::AbstractArray{T,N}; dir::Vector{Int}, indqn::Vector{Vector{Int}}=getqrange(sitetypes, size(A)), indims::Vector{Vector{Int}}=getblockdims(sitetypes, size(A)), q::Vector{Int}=[0], division::Int=1) where {T, N}
+    atype = _arraytype(A)
+    Aarray = Array(A)
+    qlist = [U1selection(sitetypes[i], indims[i]) for i = 1:N]
+    Aqn = getqn(dir, indqn; q = q, ifZ2=sitetypes[1].ifZ2)
+    tensor = [atype(Aarray[[qlist[j][indexin([Aqn[i][j]], indqn[j])...] for j = 1:N]...]) for i in 1:length(Aqn)]
+    dims = map(x -> collect(size(x)), tensor)
+    nozeroind = norm.(tensor) .!= 0
+    tensor = atype{T}(vcat(map(vec, tensor[nozeroind])...))
+    U1Array(Aqn[nozeroind], dir, tensor, size(A), dims[nozeroind], division, sitetypes[1].ifZ2)
 end

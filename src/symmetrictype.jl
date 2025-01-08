@@ -56,8 +56,8 @@ now supports:
 """
 asSymmetryArray(A::AbstractArray, ST; kwarg...) = asSymmetryArray(A, Val(ST.symmetry), ST.stype; kwarg...)
 asSymmetryArray(A::AbstractArray, ::Val{:none}; kwarg...) = A
-asSymmetryArray(A::AbstractArray, ::Val{:none}, sitetype::AbstractSiteType; kwarg...) = A
-asSymmetryArray(A::AbstractArray, ::Val{:U1}, sitetype::AbstractSiteType;  kwarg...) = asU1Array(sitetype, A; kwarg...)
+asSymmetryArray(A::AbstractArray, ::Val{:none}, sitetype; kwarg...) = A
+asSymmetryArray(A::AbstractArray, ::Val{:U1}, sitetype;  kwarg...) = asU1Array(sitetype, A; kwarg...)
 
 symmetryreshape(A::AbstractArray, s...; kwarg...) = reshape(A, s...), nothing
 symmetryreshape(A::U1Array, s...; kwarg...) = U1reshape(A, s...; kwarg...)

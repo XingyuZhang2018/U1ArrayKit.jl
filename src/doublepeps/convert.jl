@@ -30,6 +30,10 @@ function convert_bilayer_Z2(M::DoubleArray)
     DoubleArray(convert_bilayer_Z2(M.real), convert_bilayer_Z2(M.imag))
 end
 
-function asU1Array(sitetype, M::DoubleArray; kwarg...)
+function asU1Array(sitetype::AbstractSiteType, M::DoubleArray; kwarg...)
     return DoubleArray(asU1Array(sitetype, M.real; q=[0], kwarg...), asU1Array(sitetype, M.imag; q=[1], kwarg...))
+end
+
+function asU1Array(sitetypes::Vector{<:AbstractSiteType}, M::DoubleArray; kwarg...)
+    return DoubleArray(asU1Array(sitetypes, M.real; q=[0], kwarg...), asU1Array(sitetypes, M.imag; q=[1], kwarg...))
 end

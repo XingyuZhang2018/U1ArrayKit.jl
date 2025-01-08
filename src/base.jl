@@ -43,10 +43,10 @@ similar(A::U1Array, atype) = U1Array(map(copy, A.qn), copy(A.dir), atype(similar
 /(A::U1Array, B::Number) = U1Array(A.qn, A.dir, A.tensor / B, A.size, A.dims, A.division, A.ifZ2)
 /(A::Number, B::U1Array) = U1Array(B.qn, B.dir, A / B.tensor, B.size, B.dims, B.division, B.ifZ2)
 
-broadcasted(*, A::U1Array, B::Number) = U1Array(A.qn, A.dir, A.tensor .* B, A.size, A.dims, A.division, A.ifZ2)
-broadcasted(*, B::Number, A::U1Array) = U1Array(A.qn, A.dir, A.tensor .* B, A.size, A.dims, A.division, A.ifZ2)
-broadcasted(/, A::U1Array, B::Number) = A / B
-broadcasted(/, A::Number, B::U1Array) = U1Array(B.qn, B.dir, A ./ B.tensor, B.size, B.dims, B.division, B.ifZ2)
+# broadcasted(*, A::U1Array, B::Number) = U1Array(A.qn, A.dir, A.tensor .* B, A.size, A.dims, A.division, A.ifZ2)
+# broadcasted(*, B::Number, A::U1Array) = U1Array(A.qn, A.dir, A.tensor .* B, A.size, A.dims, A.division, A.ifZ2)
+# broadcasted(/, A::U1Array, B::Number) = A / B
+# broadcasted(/, A::Number, B::U1Array) = U1Array(B.qn, B.dir, A ./ B.tensor, B.size, B.dims, B.division, B.ifZ2)
 
 # for Zygote compatibility
 accum(A::U1Array, B::U1Array...) = +(A, B...)

@@ -34,12 +34,16 @@ conj(A::U1Array) = U1Array(A.qn, -A.dir, conj(A.tensor), A.size, A.dims, A.divis
 map(conj, A::U1Array) = conj(A)
 conj!(A::U1Array) = U1Array(A.qn, -A.dir, conj!(A.tensor), A.size, A.dims, A.division, A.ifZ2)
 norm(A::U1Array) = norm(A.tensor)
+norm(A::U1Array, p::Real) = norm(A.tensor, p)
+normalize!(A::U1Array) = (normalize!(A.tensor); A)
+normalize!(A::U1Array, p::Real) = (normalize!(A.tensor, p); A)
 copy(A::U1Array) = U1Array(map(copy, A.qn), copy(A.dir), copy(A.tensor), A.size, A.dims, A.division, A.ifZ2)
 similar(A::U1Array) = U1Array(map(copy, A.qn), copy(A.dir), similar(A.tensor), A.size, A.dims, A.division, A.ifZ2)
 similar(A::U1Array, atype) = U1Array(map(copy, A.qn), copy(A.dir), atype(similar(A.tensor)), A.size, A.dims, A.division, A.ifZ2)
 
 *(A::U1Array, B::Number) = U1Array(A.qn, A.dir, A.tensor * B, A.size, A.dims, A.division, A.ifZ2)
 *(B::Number, A::U1Array) = A * B
+rmul!(A::U1Array, B::Number) = (A.tensor .*= B; A)
 /(A::U1Array, B::Number) = U1Array(A.qn, A.dir, A.tensor / B, A.size, A.dims, A.division, A.ifZ2)
 /(A::Number, B::U1Array) = U1Array(B.qn, B.dir, A / B.tensor, B.size, B.dims, B.division, B.ifZ2)
 

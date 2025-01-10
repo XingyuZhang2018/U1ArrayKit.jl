@@ -1,5 +1,12 @@
-asComplexArray(A::DoubleArray) = A.real + 1im * A.imag
+function asComplexArray(A::DoubleArray)
+    if A.imag isa Nothing
+        return A.real
+    else
+        return A.real + 1im * A.imag
+    end
+end
 asArray(stype, A::DoubleArray) = DoubleArray(asArray(stype, A.real), asArray(stype, A.imag))
+asArray(stype, nothing) = nothing
 
 function convert_bilayer_Z2_front(M::AbstractArray{T, N}) where {T, N}
     D = Int(sqrt(size(M,1)))

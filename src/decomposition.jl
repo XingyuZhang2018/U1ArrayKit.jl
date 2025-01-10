@@ -13,8 +13,8 @@ function qrpos!(A)
     Q = mattype(F.Q)
     R = F.R
     phases = safesign.(diag(R))
-    rmul!(Q, Diagonal(phases))
-    lmul!(Diagonal(conj!(phases)), R)
+    Q .= Q * Diagonal(phases)
+    R .= Diagonal(conj.(phases)) * R
     return Q, R
 end
 
@@ -191,8 +191,8 @@ function lqpos!(A)
     Q = mattype(mattype(F.Q)')
     L = mattype(F.R')
     phases = safesign.(diag(L))
-    lmul!(Diagonal(phases), Q)
-    rmul!(L, Diagonal(conj!(phases)))
+    Q .= Diagonal(phases) * Q
+    L .= L * Diagonal(conj!(phases))
     return L, Q
 end
 

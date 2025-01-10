@@ -1,4 +1,4 @@
-function qrpos(A::DoubleArray) 
+function qrpos!(A::DoubleArray) 
     # A = asComplexArray(A)
     # Q, R = qrpos(A)
     # Qdiv = blockdiv(Q.dims)
@@ -13,7 +13,7 @@ function qrpos(A::DoubleArray)
     dir = A.real.dir
     div = A.real.division
     A = reshape(asArray(sitetypes, asComplexArray(A)), prod(size(A)[1:div]), prod(size(A)[div+1:end]))
-    @assert prod(size(A)[1:div]) > prod(size(A)[div+1:end]) "The number of rows must be greater than the number of columns"
+    @assert prod(size(A)[1:div]) >= prod(size(A)[div+1:end]) "The number of rows must be greater than the number of columns"
     Q, R = qrpos!(A)
     Q = reshape(Q, s.^2...)
   
@@ -30,13 +30,13 @@ function qrpos(A::DoubleArray)
     return DoubleArray(Q_real, Q_imag), DoubleArray(R_real, R_imag)
 end 
 
-function lqpos(A::DoubleArray)
+function lqpos!(A::DoubleArray)
     s = Int.(sqrt.(size(A)))
     sitetypes = [DoublePEPSZ2(s) for s in s]
     dir = A.real.dir
     div = A.real.division
     A = reshape(asArray(sitetypes, asComplexArray(A)), prod(size(A)[1:div]), prod(size(A)[div+1:end]))
-    @assert prod(size(A)[1:div]) < prod(size(A)[div+1:end]) "The number of rows must be less than the number of columns"
+    @assert prod(size(A)[1:div]) <= prod(size(A)[div+1:end]) "The number of rows must be less than the number of columns"
     L, Q = lqpos!(A)
     Q = reshape(Q, s.^2...)
   

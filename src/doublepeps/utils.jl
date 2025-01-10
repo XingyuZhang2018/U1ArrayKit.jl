@@ -1,0 +1,1 @@
+_arraytype(x::DoubleArray) = _arraytype(x.real.tensor)

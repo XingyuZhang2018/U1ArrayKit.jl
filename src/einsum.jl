@@ -50,9 +50,11 @@ function *(A::U1Array{T, NA}, B::U1Array{T, NB}) where {T, NA, NB}
     Atensor = [reshape(@view(A.tensor[Abdiv[i]]), prod(Adims[i][1:Adiv]), prod(Adims[i][Adiv+1:end])) for i in 1:length(Abdiv)]
     Btensor = [reshape(@view(B.tensor[Bbdiv[i]]), prod(Bdims[i][1:Bdiv]), prod(Bdims[i][Bdiv+1:end])) for i in 1:length(Bbdiv)]
     
-    # timesAdir = getdir(A)[Adiv+1:end]
-    # timesBdir = getdir(B)[1:Bdiv]
-    # sum(timesAdir .+ timesBdir) !== 0 && throw(Base.error("U1Array product: out and in direction not match, expect: $(-timesAdir), got: $(timesBdir)"))
+    if !(A.ifZ2 && B.ifZ2)
+        timesAdir = getdir(A)[Adiv+1:end]
+        timesBdir = getdir(B)[1:Bdiv]
+        sum(timesAdir .+ timesBdir) !== 0 && throw(Base.error("U1Array product: out and in direction not match, expect: $(-timesAdir), got: $(timesBdir)"))
+    end
 
     qs = A.ifZ2 ? map(qn -> sum(qn[Adiv+1:end]) % 2, Aqn) : map(qn -> sum(qn[Adiv+1:end] .* A.dir[Adiv+1:end]), Aqn)
     for q in unique!(qs)

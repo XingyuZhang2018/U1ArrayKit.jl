@@ -28,26 +28,30 @@ using OMEinsum
     @test FL1 ≈ FL2
 end
 
-@testset "OMEinsum with $atype{$dtype} " for atype in [Array, CuArray], dtype in [ComplexF64]
+@testset "OMEinsum with $symmetry $atype{$dtype} " for atype in [CuArray], dtype in [ComplexF64], symmetry in [:none, :U1]
     Random.seed!(100)
     qnd = [0, 1]
     qnD = [0, 1]
     qnχ = [0, 1]
 
     dimsd = [2, 2]
-    dimsD = [2, 2]
+    dimsD = [4, 4]
     dimsχ = [20, 20]
     
     d = sum(dimsd)
     D = sum(dimsD)
     χ = sum(dimsχ)
 
-    println("D = $(D) χ = $(χ)")
-    AL = randinitial(Val(:U1), atype, dtype, χ, D, D, χ; dir = [-1, -1, 1, 1], indqn = [qnχ, qnD, qnD, qnχ], indims = [dimsχ, dimsD, dimsD, dimsχ], ifZ2 = true)
-    M = randinitial(Val(:U1), atype, dtype, D, D, D, D, d; dir = [1,-1,-1,1, 1], indqn = [[qnD for _ in 1:4]..., qnd], indims = [[dimsD for _ in 1:4]..., dimsd], ifZ2 = true)
-    FL = randinitial(Val(:U1), atype, dtype, χ, D, D, χ; dir = [1, -1, 1, -1], indqn = [qnχ, qnD, qnD, qnχ], indims = [dimsχ, dimsD, dimsD, dimsχ], ifZ2 = true)
+    println("d = $(d) D = $(D) χ = $(χ)")
+    AL = randinitial(Val(symmetry), atype, dtype, χ, D, D, χ; dir = [-1, -1, 1, 1], indqn = [qnχ, qnD, qnD, qnχ], indims = [dimsχ, dimsD, dimsD, dimsχ], ifZ2 = true)
+    M = randinitial(Val(symmetry), atype, dtype, D, D, D, D, d; dir = [1,-1,-1,1, 1], indqn = [[qnD for _ in 1:4]..., qnd], indims = [[dimsD for _ in 1:4]..., dimsd], ifZ2 = true)
+    FL = randinitial(Val(symmetry), atype, dtype, χ, D, D, χ; dir = [1, -1, 1, -1], indqn = [qnχ, qnD, qnD, qnχ], indims = [dimsχ, dimsD, dimsD, dimsχ], ifZ2 = true)
 
-    @time CUDA.@sync FL1 = ein"(((aefi,ijkl),ejgbp),fkhcp),abcd -> dghl"(FL, conj(AL), M, conj(M), AL)
-    @time CUDA.@sync FL2 = ein"((aefi,ijkl),(ejgbp,fkhcp)),abcd -> dghl"(FL, conj(AL), M, conj(M), AL)
-    @test FL1 ≈ FL2
+    # @time CUDA.@sync FL1 = ein"(((aefi,ijkl),ejgbp),fkhcp),abcd -> dghl"(FL, conj(AL), M, conj(M), AL)
+    # M = ein"ejgbp,fkhcp->efjkghbc"(M, conj(M))
+    # @time CUDA.@sync FL2 = ein"((aefi,ijkl),efjkghbc),abcd -> dghl"(FL, conj(AL), M, AL)
+    # @test FL1 ≈ FL2
+    @btime CUDA.@sync ein"(((aefi,ijkl),ejgbp),fkhcp),abcd -> dghl"($FL, conj($AL), $M, conj($M), $AL)
+    M = ein"ejgbp,fkhcp->efjkghbc"(M, conj(M))
+    @btime CUDA.@sync ein"((aefi,ijkl),efjkghbc),abcd -> dghl"($FL, conj($AL), $M, $AL)
 end

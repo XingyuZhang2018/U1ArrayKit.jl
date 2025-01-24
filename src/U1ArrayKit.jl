@@ -1,10 +1,12 @@
 module U1ArrayKit
 
 using CUDA
+using ChainRulesCore
 using LinearAlgebra
 using OMEinsum
 using Parameters
 using Zygote
+using Zygote: @adjoint
 
 import Base: ==, +, -, *, /, ≈, size, reshape, permutedims, transpose, conj, conj!, show, similar, adjoint, copy, sqrt, getindex, setindex!, Array, broadcasted, vec, map, ndims, indexin, sum, zero
 import CUDA: CuArray
@@ -33,6 +35,7 @@ include("vectorinterface.jl")
 include("decomposition.jl")
 include("u1reshape.jl")
 include("symmetrictype.jl")
+include("autodiff.jl")
 include("doublepeps/base.jl")
 include("doublepeps/convert.jl")
 include("doublepeps/initial.jl")

@@ -31,7 +31,7 @@ size(A::U1Array) = A.size
 size(A::U1Array, a) = size(A)[a]
 getdir(A::U1Array) = A.dir
 conj(A::U1Array) = U1Array(A.qn, -A.dir, conj(A.tensor), A.size, A.dims, A.division, A.ifZ2)
-map(conj, A::U1Array) = conj(A)
+# map(conj, A::U1Array) = conj(A)
 conj!(A::U1Array) = U1Array(A.qn, -A.dir, conj!(A.tensor), A.size, A.dims, A.division, A.ifZ2)
 norm(A::U1Array) = norm(A.tensor)
 norm(A::U1Array, p::Real) = norm(A.tensor, p)
@@ -51,9 +51,6 @@ rmul!(A::U1Array, B::Number) = (A.tensor .*= B; A)
 # broadcasted(*, B::Number, A::U1Array) = U1Array(A.qn, A.dir, A.tensor .* B, A.size, A.dims, A.division, A.ifZ2)
 # broadcasted(/, A::U1Array, B::Number) = A / B
 # broadcasted(/, A::Number, B::U1Array) = U1Array(B.qn, B.dir, A ./ B.tensor, B.size, B.dims, B.division, B.ifZ2)
-
-# for Zygote compatibility
-accum(A::U1Array, B::U1Array...) = +(A, B...)
 
 function +(A::U1Array, B::U1Array)
     if B.qn == A.qn
@@ -160,6 +157,11 @@ function sqrt(A::U1Array)
     U1Array(A.qn, A.dir, tensor, A.size, A.dims, A.division, A.ifZ2)
 end
 broadcasted(sqrt, A::U1Array) = sqrt(A)
+
+function dot(A::U1Array, B::U1Array) 
+    @assert A.qn == B.qn
+    dot(A.tensor, B.tensor)
+end
 
 # # for ' in ACCtoALAR of TeneT
 function adjoint(A::U1Array{T,N}) where {T,N}

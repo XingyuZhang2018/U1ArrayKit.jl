@@ -16,9 +16,10 @@ function convert_bilayer_Z2_front(M::AbstractArray{T, N}) where {T, N}
         if i == j
             M′[i,j,k] = M[i,j,k]
         elseif i < j
-            M′[i,j,k] = (M[i,j,k] + M[j,i,k])/sqrt(2)
-        else
-            M′[i,j,k] = (M[i,j,k] - M[j,i,k])/sqrt(2) 
+            u = M[i,j,k]
+            l = M[j,i,k]
+            M′[i,j,k] = (u + l)/sqrt(2)
+            M′[j,i,k] = (u - l)/sqrt(2) 
         end
     end
 
@@ -31,6 +32,38 @@ function convert_bilayer_Z2(M::AbstractArray{T, N}) where {T, N}
         M = convert_bilayer_Z2_front(M)
     end
     return permutedims(M, [2, [3:N; 1]...])
+end
+
+function invert_bilayer_Z2_front(M::AbstractArray{T, N}) where {T, N}
+    D = Int(sqrt(size(M,1)))
+    M′ = zeros(T, D, D, prod(size(M))÷D^2)
+    M = reshape(M, D, D, prod(size(M))÷D^2)
+    
+    for i in 1:D, j in 1:D, k in 1:prod(size(M))÷D^2
+        if i == j
+            M′[i,j,k] = M[i,j,k]
+        elseif i < j
+            u = M[i,j,k]
+            l = M[j,i,k]
+            M′[i,j,k] = (u + l) / sqrt(2)
+            M′[j,i,k] = (u - l) / sqrt(2)
+        end
+    end
+    
+    return reshape(M′, [D^2 for i in 1:N]...)
+end
+
+function invert_bilayer_Z2(M::AbstractArray{T, N}) where {T, N}
+    M = permutedims(M, [N; 1:N-1])
+    
+    for i in N:-1:1
+        M = invert_bilayer_Z2_front(M)
+        if i != 1
+            M = permutedims(M, [N; 1:N-1])
+        end
+    end
+    
+    return M
 end
 
 function convert_bilayer_Z2(M::DoubleArray)

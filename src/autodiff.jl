@@ -150,7 +150,7 @@ function blockbackQR!(dA::U1Array, Abdiv, Qqn, Qdiv, Qdir, Qtensor, Rqn, Rtensor
     ind_A = ifZ2 ? findall(x->sum(x[Qdiv+1:end]) % 2 == q, Qqn) : findall(x->sum(x[Qdiv+1:end] .* Qdir[Qdiv+1:end]) == q, Qqn)
     m_j = unique(map(x->x[Qdiv+1:end], Qqn[ind_A]))
     m_i = unique(map(x->x[1:Qdiv], Qqn[ind_A]))
-
+    
     ind = indexin([[i; m_j[1]] for i in m_i], Qqn)
     dQm = vcat(dQtensor[ind]...)
     Qm = vcat(Qtensor[ind]...)
@@ -193,7 +193,7 @@ function ChainRulesCore.rrule(::typeof(lqpos), A::U1Array)
         for q in unique(qs)
             blockbackLQ!(dA::U1Array, Abdiv, Qqn, Qdiv, Qdir, Qtensor, Lqn, Ltensor, dQtensor, dLtensor, q, A.ifZ2)
         end
-        @show 333333333 typeof(dA)
+
         return NoTangent(), dA
     end
     return (L, Q), back

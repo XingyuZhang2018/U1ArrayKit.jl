@@ -23,7 +23,7 @@ export asArray, asSymmetryArray, symmetryreshape, getsymmetry, getdir
 export dtr, qrpos, lqpos, qrpos!, lqpos!
 export _mattype, _arraytype
 export U1Array, U1reshape, U1reshapeinfo
-export DoubleArray, convert_bilayer_Z2, asComplexArray, randU1double, IU1double
+export DoubleArray, convert_bilayer_Z2, invert_bilayer_Z2, asComplexArray, randU1double, IU1double
 
 include("sitetype.jl")
 include("base.jl")
